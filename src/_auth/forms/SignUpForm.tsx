@@ -56,7 +56,9 @@ const SignUpForm = () => {
     });
 
     if (!session) {
-      return message.error("Sign up failed, Please try again!");
+      message.error("Sign up failed, Please try again!");
+      navigate("/sign-in");
+      return;
     }
 
     const isLoggedIn = await checkAuthUser();
@@ -66,6 +68,7 @@ const SignUpForm = () => {
       navigate("/");
     } else {
       message.error("Sign up failed, Please try again!");
+      return;
     }
   }
   return (
