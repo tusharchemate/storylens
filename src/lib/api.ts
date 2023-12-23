@@ -50,6 +50,7 @@ export async function saveUserInDB(user: {
       ID.unique(),
       user
     );
+    return newUser;
   } catch (err) {
     console.log(err);
   }
