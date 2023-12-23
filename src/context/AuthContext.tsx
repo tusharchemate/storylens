@@ -1,7 +1,8 @@
-import { getCurrentAccount } from "@/lib/api";
-import { IUser } from "@/types";
-import React, { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { createContext, useContext, useEffect, useState } from "react";
+
+import { IUser } from "@/types";
+import { useGetCurrentUser } from "@/lib/react-query/queriesAndMutation";
 
 export const INITIAL_USER = {
   id: "",
@@ -14,68 +15,80 @@ export const INITIAL_USER = {
 
 const INITIAL_STATE = {
   user: INITIAL_USER,
-  isPending: false,
+  isLoading: false,
   isAuthenticated: false,
-  setUser: () => {},
-  setIsAuthenticatedUser: () => {},
+  setUser: () => { },
+  setIsAuthenticated: () => { },
   checkAuthUser: async () => false as boolean,
 };
 
-const AuthContext = createContext(INITIAL_STATE);
+type IContextType = {
+  user: IUser;
+  isLoading: boolean;
+  setUser: React.Dispatch<React.SetStateAction<IUser>>;
+  isAuthenticated: boolean;
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+  checkAuthUser: () => Promise<boolean>;
+};
 
-const AuthProvider = ({ children }: any) => {
-  const [user, setUser] = useState<IUser>(INITIAL_USER);
-  const [isPending, setIsPending] = useState<Boolean>(false);
-  const [isAuthenticated, setIsAuthenticatedUser] = useState<Boolean>(false);
+const AuthContext = createContext<IContextType>(INITIAL_STATE);
 
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
+  const [user, setUser] = useState<IUser>(INITIAL_USER);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const checkAuthUser = async () => {
+    setIsLoading(true);
     try {
-      const currentAccount = await getCurrentAccount();
-
+      const currentAccount: any = await useGetCurrentUser();
       if (currentAccount) {
         setUser({
-          id: currentAccount?.$id,
+          id: currentAccount.$id,
           name: currentAccount.name,
           username: currentAccount.username,
           email: currentAccount.email,
           imageUrl: currentAccount.imageUrl,
           bio: currentAccount.bio,
         });
-        setIsAuthenticatedUser(true);
-        return true;
+        setIsAuthenticated(true);
+
+        return true; 
       }
+
       return false;
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.error(error);
       return false;
     } finally {
-      setIsPending(false);
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
+    const cookieFallback = localStorage.getItem("cookieFallback");
     if (
-      localStorage.getItem("cookieFallback") === "[]" ||
-      localStorage.getItem("cookieFallback") === "null"
-    )
+      cookieFallback === "[]" ||
+      cookieFallback === null ||
+      cookieFallback === undefined
+    ) {
       navigate("/sign-in");
+    }
+
     checkAuthUser();
   }, []);
 
   const value = {
     user,
     setUser,
-    isPending,
+    isLoading,
     isAuthenticated,
-    setIsAuthenticatedUser,
+    setIsAuthenticated,
     checkAuthUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
-
-export default AuthProvider;
+}
 
 export const useUserContext = () => useContext(AuthContext);

@@ -33,10 +33,10 @@ const PostForm = ({ post, action }: PostFormProps) => {
 
   const navigate = useNavigate();
 
-  const { mutateAsync: createPost, isPending: isLoadingCreate } =
+  const { mutateAsync: createPost } =
     useCreatePost();
 
-  const { mutateAsync: updatePost, isPending: isLoadingUpdate } =
+  const { mutateAsync: updatePost } =
     useUpdatePost();
 
   const form = useForm<z.infer<typeof PostValidation>>({
