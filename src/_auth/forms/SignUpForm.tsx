@@ -68,6 +68,7 @@ const SignUpForm = () => {
       navigate("/");
     } else {
       message.error("Sign up failed, Please try again!");
+      navigate("/");
       return;
     }
   }
