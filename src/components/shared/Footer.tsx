@@ -1,0 +1,38 @@
+import { footerLinks } from "@/constants";
+import { INavLink } from "@/types";
+import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+
+const Footer = () => {
+  const { pathname } = useLocation();
+
+  return (
+    <section className="bottom-bar">
+      {footerLinks?.map((link: INavLink) => {
+        const isActive = pathname == link.route;
+        return (
+          <Link
+            to={link.route}
+            key={link.label}
+            className={`${
+              isActive && "bg-primary-500"
+            } rounded-[10px]  flex-center flex-col gap-1 p-2 transition`}
+          >
+            <img
+              src={link.imgURL}
+              width={16}
+              height={16}
+              className={`group-hover:invert-white ${
+                isActive && "invert-white"
+              }`}
+            />
+            <p className="tiny-medium text-light-2">{link.label}</p>
+          </Link>
+        );
+      })}
+    </section>
+  );
+};
+
+export default Footer;
