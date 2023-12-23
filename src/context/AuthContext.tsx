@@ -1,8 +1,7 @@
-import { useNavigate } from "react-router-dom";
-import { createContext, useContext, useEffect, useState } from "react";
-
-import { IUser } from "@/types";
 import { useGetCurrentUser } from "@/lib/react-query/queriesAndMutation";
+import { IUser } from "@/types";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const INITIAL_USER = {
   id: "",
@@ -22,18 +21,19 @@ const INITIAL_STATE = {
   checkAuthUser: async () => false as boolean,
 };
 
-type IContextType = {
+interface IContextType {
   user: IUser;
   isLoading: boolean;
   setUser: React.Dispatch<React.SetStateAction<IUser>>;
   isAuthenticated: boolean;
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
   checkAuthUser: () => Promise<boolean>;
-};
+}
 
 const AuthContext = createContext<IContextType>(INITIAL_STATE);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+
+const AuthProvider = ({ children }: any) => {
   const navigate = useNavigate();
   const [user, setUser] = useState<IUser>(INITIAL_USER);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -54,7 +54,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
         setIsAuthenticated(true);
 
-        return true; 
+        return true;
       }
 
       return false;
@@ -89,6 +89,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
+};
+
+export default AuthProvider;
 
 export const useUserContext = () => useContext(AuthContext);
