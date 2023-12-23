@@ -10,7 +10,7 @@ import {
 import { useState } from "react";
 
 const Explore = () => {
-  const { data: posts, fetchNextPage, hasNextPage } = useGetPosts();
+  const { data: posts } = useGetPosts();
 
   const [searchValue, setSearchValue] = useState("");
   const debounceValue = useDebounce(searchValue, 500);
@@ -68,7 +68,7 @@ const Explore = () => {
         ) : showPost ? (
           <p className="text-light-4 mt-10 text-center w-full"> End of posts</p>
         ) : (
-          posts?.pages.map((item, index) => (
+          posts?.pages.map((item) => (
             <GridPostList posts={item.documents} />
           ))
         )}
