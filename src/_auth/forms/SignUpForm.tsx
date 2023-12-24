@@ -83,7 +83,7 @@ const SignUpForm = () => {
           Create a new account
         </h2>
         <p className="text-light-2 small-medium md:base-regular mt-2">
-          To use Story Sphere enter your details
+          To use Storylens enter your details
         </p>
 
         <form
