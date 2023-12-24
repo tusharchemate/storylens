@@ -1,7 +1,7 @@
-import { useGetCurrentUser } from "@/lib/react-query/queriesAndMutation";
-import { IUser } from "@/types";
-import React, { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { createContext, useContext, useEffect, useState } from "react";
+import { IUser } from "@/types";
+import { getCurrentAccount } from "@/lib/api";
 
 export const INITIAL_USER = {
   id: "",
@@ -21,19 +21,18 @@ const INITIAL_STATE = {
   checkAuthUser: async () => false as boolean,
 };
 
-interface IContextType {
+type IContextType = {
   user: IUser;
   isLoading: boolean;
   setUser: React.Dispatch<React.SetStateAction<IUser>>;
   isAuthenticated: boolean;
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
   checkAuthUser: () => Promise<boolean>;
-}
+};
 
 const AuthContext = createContext<IContextType>(INITIAL_STATE);
 
-
-const AuthProvider = ({ children }: any) => {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const [user, setUser] = useState<IUser>(INITIAL_USER);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -42,7 +41,7 @@ const AuthProvider = ({ children }: any) => {
   const checkAuthUser = async () => {
     setIsLoading(true);
     try {
-      const currentAccount: any = await useGetCurrentUser();
+      const currentAccount = await getCurrentAccount();
       if (currentAccount) {
         setUser({
           id: currentAccount.$id,
@@ -89,8 +88,6 @@ const AuthProvider = ({ children }: any) => {
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
-
-export default AuthProvider;
+}
 
 export const useUserContext = () => useContext(AuthContext);
